@@ -31,7 +31,7 @@ document.querySelector('#quote-form').addEventListener('submit',event=>{
   const campaign=[savedAttribution.utm_source,savedAttribution.utm_campaign,savedAttribution.gclid].filter(Boolean).join(' / ');
   if(campaign)parts.push(`Referencia de campaña: ${campaign}.`);
   convert('whatsapp_form');sessionStorage.setItem('siama_lead_started','1');
-  window.open('https://wa.me/525576958468?text='+encodeURIComponent(parts.filter(Boolean).join(' ')),'_blank','noopener,noreferrer');
+  window.open('https://wa.me/525555004337?text='+encodeURIComponent(parts.filter(Boolean).join(' ')),'_blank','noopener,noreferrer');
 });
 
 const quoteForm=document.querySelector('#quote-form');let formStarted=false;
