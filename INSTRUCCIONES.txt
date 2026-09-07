@@ -1,0 +1,19 @@
+PAQUETE CORREGIDO PARA GITHUB PAGES
+
+1. Entra al repositorio de GitHub.
+2. Elimina de la RAIZ el index.html anterior y cualquier carpeta assets anterior que esté incompleta.
+3. Sube TODO el contenido de esta carpeta directamente a la RAIZ del repositorio.
+4. Al abrir el repositorio debes ver juntos:
+   - index.html
+   - privacidad.html
+   - manifest.webmanifest
+   - CNAME
+   - assets
+5. En Settings > Pages elige:
+   Source: Deploy from a branch
+   Branch: main
+   Folder: / (root)
+6. En Custom domain escribe: siamaambulancias.com.mx
+7. Guarda y, cuando esté disponible, activa Enforce HTTPS.
+
+IMPORTANTE: No subas la carpeta contenedora. Sube los archivos que están dentro de ella.
