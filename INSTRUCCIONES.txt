@@ -1,19 +1,12 @@
-PAQUETE CORREGIDO PARA GITHUB PAGES
+SIAMA · WEB RENOVADA / GITHUB PAGES (octubre 2026)
 
-1. Entra al repositorio de GitHub.
-2. Elimina de la RAIZ el index.html anterior y cualquier carpeta assets anterior que esté incompleta.
-3. Sube TODO el contenido de esta carpeta directamente a la RAIZ del repositorio.
-4. Al abrir el repositorio debes ver juntos:
-   - index.html
-   - privacidad.html
-   - manifest.webmanifest
-   - CNAME
-   - assets
-5. En Settings > Pages elige:
-   Source: Deploy from a branch
-   Branch: main
-   Folder: / (root)
-6. En Custom domain escribe: siamaambulancias.com.mx
-7. Guarda y, cuando esté disponible, activa Enforce HTTPS.
+1. Abre el ZIP. En GitHub sube TODOS los archivos DENTRO de siama-ambulancias-main a la raíz de tu repositorio, incluido .github (carpeta oculta).
+2. GitHub > Settings > Pages > Source: GitHub Actions. Haz commit a main o master.
+3. Conserva CNAME y confirma DNS de siamaambulancias.com.mx.
+4. IMPORTANTE: agrega tus identificadores reales de Google Ads en assets/google-ads-config.js; el original solo contiene valores de ejemplo.
+5. Completa la razón social/domicilio en privacidad.html y términos.html; revisa con un asesor legal.
+6. El costo de traslados no se inventó: configura tarifas oficiales en assets/tarifas.js si deseas estimados.
+7. Prueba desde un iPhone/Android real llamadas, WhatsApp y permisos de ubicación en el dominio HTTPS.
+8. En Search Console envía /sitemap.xml; el posicionamiento en los primeros lugares no está garantizado.
 
-IMPORTANTE: No subas la carpeta contenedora. Sube los archivos que están dentro de ella.
+WhatsApp y llamadas: +52 55 5500 4337.

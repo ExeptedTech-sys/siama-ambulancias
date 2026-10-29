@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://siamaambulancias.com.mx/sitemap.xml
