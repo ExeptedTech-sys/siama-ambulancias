@@ -1,13 +1,15 @@
-# SIAMA Ambulancias · Renovación 2026
+# SIAMA Ambulancias · REYO ASSISTANT BASIC · 2026-11-01
 
 Web estática y responsive para GitHub Pages, sin compilador, pagos ni base de datos. Incluye diseño rojo candy + negro, fotografías aportadas del personal SIAMA y recursos optimizados, accesos de llamada y WhatsApp, formulario inteligente, SEO local, páginas específicas por intención de búsqueda, páginas legales y medición publicitaria bajo consentimiento.
+
+**Nuevo:** asistente REYO BASIC (respuestas locales + cotización express), página original conservada, mejora de SEO para altas médicas y eventos de Google Ads por intención. Consulta `GUIA_SEO_ADS_REYO.md` para configurar anuncios y funciones.
 
 ## Desplegar en GitHub Pages
 
 1. Descomprime el ZIP y **sube el contenido de `siama-ambulancias-main/` a la raíz del repositorio** (incluye `.github/`, `assets/`, `index.html` y `CNAME`). No subas la carpeta contenedora como un nivel extra.
 2. Revisa que `CNAME` tenga el dominio `siamaambulancias.com.mx`, tal como estaba en tu proyecto anterior.
 3. En GitHub, en **Settings → Pages**, selecciona **GitHub Actions** como fuente de publicación.
-4. Haz un commit a `main` o `master`. El workflow `.github/workflows/deploy.yml` publica la raíz automáticamente.
+4. Haz un commit a `main` o `master`. El workflow `.github/workflows/deploy.yml` ahora publica la **raíz** (`.`) automáticamente. No hace falta crear `dist`.
 5. Verifica en la web los botones, enlaces, consentimiento y cotizador.
 
 ## Verificaciones OBLIGATORIAS antes de publicar

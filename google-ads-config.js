@@ -1,6 +1,1 @@
-// Reemplaza los valores cuando Google Ads te entregue tus identificadores.
-window.SIAMA_GOOGLE_ADS_ID = 'AW-XXXXXXXXX';
-window.SIAMA_GOOGLE_ADS_CONVERSIONS = {
-  call: '',
-  whatsapp: ''
-};
+// Archivo legado. Edita assets/google-ads-config.js (fuente de configuración activa).

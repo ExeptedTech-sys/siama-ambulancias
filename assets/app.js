@@ -46,17 +46,34 @@
     $$('.coverage-panel').forEach(panel=>{panel.hidden=panel.id!=='panel-'+btn.dataset.tab});
   }));
 
-  // Marketing measurement only on explicit consent. No fake conversion IDs or ad pixels.
+  // All-page Google Ads click measurement, only after explicit opt-in.
+  // CTA events mean an attempted contact, NOT a booked ambulance or qualified sale.
   const CONSENT_KEY='siama_ads_consent_v2';
-  const consent=safeStore.get(CONSENT_KEY);
-  const adsBanner=$('#consent-banner');
   const attributionKeys=['utm_source','utm_medium','utm_campaign','utm_term','utm_content','gclid','gbraid','wbraid'];
   let attribution={};
+  const params=new URLSearchParams(location.search);
+  // Campaign parameters are propagated ONLY to internal site links, not to third parties.
+  function propagateCampaign(){
+    if(!attributionKeys.some(k=>params.has(k)))return;
+    $$('a[href^="index.html"],a[href^="traslados-"],a[href^="ambulancias-"]').forEach(a=>{
+      try{const target=new URL(a.getAttribute('href'),location.href);if(target.origin!==location.origin)return;
+        attributionKeys.forEach(k=>{const v=params.get(k);if(v&&!target.searchParams.has(k))target.searchParams.set(k,v.slice(0,180))});
+        a.href=target.toString();
+      }catch{}
+    });
+  }
+  propagateCampaign();
   function storeAttribution(){
-    const params=new URLSearchParams(location.search);
     attributionKeys.forEach(k=>{const v=params.get(k);if(v)attribution[k]=v.slice(0,180)});
     if(Object.keys(attribution).length){attribution.landing_page=location.pathname;attribution.captured_at=new Date().toISOString();safeStore.set('siama_campaign',JSON.stringify(attribution))}
     else {try{attribution=JSON.parse(safeStore.get('siama_campaign')||'{}')||{}}catch{attribution={}}}
+  }
+  // Subpages also need the same choice: original subpages did not display it.
+  let adsBanner=$('#consent-banner');
+  if(!adsBanner){
+    adsBanner=document.createElement('div');adsBanner.className='consent-banner';adsBanner.id='consent-banner';adsBanner.hidden=true;
+    adsBanner.innerHTML='<div><b>Privacidad y medición</b><p>Solo con tu autorización medimos clics procedentes de campañas de Google Ads. <a href="privacidad.html">Aviso de privacidad</a>.</p></div><div class="consent-actions"><button id="reject-ads" class="btn btn-outline" type="button">Rechazar</button><button id="accept-ads" class="btn btn-red" type="button">Aceptar medición</button></div>';
+    document.body.appendChild(adsBanner);
   }
   function startAds(){
     storeAttribution();
@@ -67,24 +84,32 @@
     window.gtag=function(){window.dataLayer.push(arguments)};
     window.gtag('js',new Date());
     window.gtag('config',id,{send_page_view:true});
-    const script=document.createElement('script');
-    script.async=true;script.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(id);
+    const script=document.createElement('script');script.async=true;
+    script.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(id);
     document.head.appendChild(script);
   }
-  if(consent==='yes')startAds();
-  if(adsBanner && consent!=='yes' && consent!=='no')adsBanner.hidden=false;
+  if(safeStore.get(CONSENT_KEY)==='yes')startAds();
+  if(safeStore.get(CONSENT_KEY)!=='yes'&&safeStore.get(CONSENT_KEY)!=='no')adsBanner.hidden=false;
   $('#accept-ads')?.addEventListener('click',()=>{safeStore.set(CONSENT_KEY,'yes');adsBanner.hidden=true;startAds()});
-  $('#reject-ads')?.addEventListener('click',()=>{const previouslyAccepted=safeStore.get(CONSENT_KEY)==='yes';safeStore.set(CONSENT_KEY,'no');adsBanner.hidden=true;if(previouslyAccepted)location.reload()});
-  $('#manage-consent')?.addEventListener('click',()=>{if(adsBanner){adsBanner.hidden=false;adsBanner.scrollIntoView({block:'nearest'})}});
-  function eventTrack(action,extras={}) {
+  $('#reject-ads')?.addEventListener('click',()=>{const prev=safeStore.get(CONSENT_KEY)==='yes';safeStore.set(CONSENT_KEY,'no');adsBanner.hidden=true;safeStore.set('siama_campaign','');if(prev)location.reload()});
+  $('#manage-consent')?.addEventListener('click',()=>{adsBanner.hidden=false;adsBanner.scrollIntoView({block:'nearest'})});
+  function eventTrack(action,extras={}){
     if(safeStore.get(CONSENT_KEY)!=='yes'||typeof window.gtag!=='function')return;
-    const kind=action.startsWith('call')?'call':'whatsapp';
-    window.gtag('event',kind==='call'?'phone_click':'whatsapp_click',{event_category:'contact_click',event_label:action,...extras});
+    const mapped=action==='reyo_quote_whatsapp_open'||action==='quote_whatsapp_open'?'quote':action.startsWith('call')?'call':action.startsWith('whatsapp')?'whatsapp':null;
+    window.gtag('event',action,{contact_method:mapped||'site',...extras});
     const config=window.SIAMA_GOOGLE_ADS_CONVERSIONS||{};
-    const sendTo=kind==='call'?config.call:config.whatsapp;
-    if(typeof sendTo==='string'&&/^AW-\d{6,20}\/.+/.test(sendTo))window.gtag('event','conversion',{send_to:sendTo});
+    const sendTo=mapped?config[mapped]:null;
+    if(typeof sendTo==='string'&&/^AW-\d{6,20}\/[a-zA-Z0-9_-]+$/.test(sendTo)){
+      window.gtag('event','conversion',{send_to:sendTo});
+    }
   }
-  $$('.track').forEach(link=>link.addEventListener('click',()=>eventTrack(link.dataset.action||'whatsapp_general')));
+  window.SIAMA_TRACK=eventTrack;
+  document.addEventListener('click',e=>{
+    const link=e.target.closest('a[href]');if(!link)return;
+    const href=link.getAttribute('href')||'';
+    if(href.startsWith('tel:'))eventTrack('call_click',{placement:link.dataset.action||'general'});
+    else if(/^https:\/\/wa\.me\//.test(href))eventTrack('whatsapp_click',{placement:link.dataset.action||'general'});
+  });
 
   // Quote form always opens an actionable WhatsApp draft; no server, no medical records stored.
   const quote=$('#quote-form');
@@ -181,7 +206,7 @@
       else parts.push('Solicito confirmar disponibilidad y tarifa del servicio.');
       if(safeStore.get(CONSENT_KEY)==='yes'&&attribution.utm_campaign)parts.push(`Referencia de campaña: ${attribution.utm_campaign}`);
       parts.push('Enviado desde siamaambulancias.com.mx');
-      eventTrack('whatsapp_quote_form',{form_name:'cotizacion_siama',service_type:d.service});
+      eventTrack('quote_whatsapp_open',{form_name:'cotizacion_siama',service_type:d.service});
       const url=`https://wa.me/${TEL}?text=${encodeURIComponent(parts.join('\n'))}`;
       // Direct navigation avoids popup blocking on Android, iOS and desktop browsers.
       window.location.assign(url)
